@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Xtreme Aviator Predictor : Melbet</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
+    html, body {
+      min-height: 100vh;
+      background: #000;
+      color: #fff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .content { 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      padding-top: 50px;
+      padding-bottom: 20px;
+    }
+    header {
+      text-align: center;
+      padding: 1rem;
+      font-size: 1.6rem;
+      font-weight: bold;
+      background: linear-gradient(to right, #ff0000, #8b0000);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+      border-radius: 12px;
+      margin: 1rem;
+      margin-top: 30px;
+      border: 2px solid #fff;
+      position: relative;
+      overflow: hidden;
+    }
+    header::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(
+        to bottom right,
+        rgba(255,255,255,0) 0%,
+        rgba(255,255,255,0.3) 50%,
+        rgba(255,255,255,0) 100%
+      );
+      transform: rotate(30deg);
+      animation: shine 3s infinite;
+      opacity: 0;
+    }
+    #liveTime {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 1rem auto;
+      font-size: 1rem;
+      color: #000;
+      background-color: #fff;
+      padding: 0.5rem 1rem;
+      border-radius: 50px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.4);
+    }
+    .signal-box {
+      margin: 1rem auto;
+      width: 250px;
+      height: 250px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.1);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      border: 3px solid #fff;
+      position: relative;
+    }
+    .signal-box.loading {
+      box-shadow: 0 0 20px rgba(173, 216, 255, 0.6),
+                  0 0 40px rgba(173, 216, 255, 0.4),
+                  0 0 60px rgba(173, 216, 255, 0.2);
+      animation: pulse 2s infinite;
+    }
+    .signal-box.waiting {
+      box-shadow: 0 0 20px rgba(255, 0, 0, 0.6),
+                  0 0 40px rgba(255, 0, 0, 0.4),
+                  0 0 60px rgba(255, 0, 0, 0.2);
+    }
+    .signal-box.active {
+      box-shadow: 0 0 20px rgba(0, 255, 0, 0.6),
+                  0 0 40px rgba(0, 255, 0, 0.4),
+                  0 0 60px rgba(0, 255, 0, 0.2);
+    }
+    .signal-content {
+      text-align: center;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 1.3rem;
+      padding: 0 1rem;
+      width: 100%;
+    }
+    .signal-time {
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+      font-size: 1.3rem;
+    }
+    .odd-display {
+      text-align: center;
+      margin: 1.5rem auto;
+      font-size: 1.3rem;
+      color: #fff;
+      background-color: #f4c542;
+      padding: 0.6rem 1.4rem;
+      border-radius: 50px;
+      border: 2px solid #fff;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+      position: relative;
+      overflow: hidden;
+      width: 300px;
+      white-space: nowrap;
+      min-height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .odd-display::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(
+        to bottom right,
+        rgba(255,255,255,0) 0%,
+        rgba(255,255,255,0.3) 50%,
+        rgba(255,255,255,0) 100%
+      );
+      transform: rotate(30deg);
+      animation: shine 3s infinite;
+      opacity: 0;
+    }
+    .countdown-timer {
+      font-size: 1.3rem;
+      margin: 0.3rem 0;
+      padding: 0.3rem 0.8rem;
+      border-radius: 20px;
+      border: 1px solid #fff;
+    }
+    .buttons {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+    .buttons a {
+      text-decoration: none;
+      color: white;
+      padding: 0.6rem 1.2rem;
+      border-radius: 12px;
+      font-weight: 600;
+      border: 2px solid #fff;
+      background: linear-gradient(to right, #43e97b, #38f9d7);
+      transition: transform 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+    .buttons a::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(
+        to bottom right,
+        rgba(255,255,255,0) 0%,
+        rgba(255,255,255,0.3) 50%,
+        rgba(255,255,255,0) 100%
+      );
+      transform: rotate(30deg);
+      animation: shine 3s infinite;
+      opacity: 0;
+    }
+    .buttons a.telegram {
+      background: linear-gradient(to right, #667eea, #764ba2);
+    }
+    .buttons a:hover { 
+      transform: scale(1.05);
+    }
+    .buttons a:hover::before {
+      opacity: 1;
+    }
+    footer {
+      text-align: center;
+      font-size: 0.9rem;
+      padding: 1rem;
+      margin-top: 2rem;
+    }
+    @keyframes shine {
+      0% {
+        transform: rotate(30deg) translate(-20%, -20%);
+        opacity: 0;
+      }
+      20% {
+        opacity: 1;
+      }
+      100% {
+        transform: rotate(30deg) translate(100%, 100%);
+        opacity: 0;
+      }
+    }
+    .shine-effect {
+      animation: quickShine 1.5s ease-out;
+    }
+    @keyframes quickShine {
+      0% {
+        box-shadow: 0 0 5px rgba(255,255,255,0);
+      }
+      50% {
+        box-shadow: 0 0 20px rgba(255,255,255,0.8);
+      }
+      100% {
+        box-shadow: 0 0 5px rgba(255,255,255,0);
+      }
+    }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 10px rgba(173, 216, 255, 0.6); }
+      50% { box-shadow: 0 0 20px rgba(173, 216, 255, 0.8); }
+      100% { box-shadow: 0 0 10px rgba(173, 216, 255, 0.6); }
+    }
+    .loading-container {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    .loading-title {
+      font-weight: bold;
+      font-size: 1.4rem;
+      color: #fff;
+      text-align: center;
+      line-height: 1.3;
+      margin-bottom: 15px;
+      text-shadow: 0 0 8px rgba(255,255,255,0.3);
+    }
+    .loading-text {
+      font-size: 0.95rem;
+      color: rgba(255,255,255,0.8);
+      text-align: center;
+      line-height: 1.4;
+      position: relative;
+    }
+    .loading-dots::after {
+      content: '.';
+      animation: dots 1.5s infinite;
+    }
+    @keyframes dots {
+      0%, 20% { content: '.'; }
+      40% { content: '..'; }
+      60%, 100% { content: '...'; }
+    }
+    /* JSON සංඥා සඳහා අතිරේක ස්ටයිල් */
+    .signal-tag {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(0,0,0,0.7);
+      color: white;
+      padding: 2px 6px;
+      border-radius: 10px;
+      font-size: 0.8rem;
+    }
+    .signal-box.active .signal-tag {
+      background: rgba(255,255,255,0.9);
+      color: #000;
+    }
+    .update-notification {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: rgba(0,0,0,0.8);
+      color: white;
+      padding: 10px 15px;
+      border-radius: 5px;
+      border-left: 4px solid #f4c542;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      z-index: 1000;
+      display: none;
+      animation: fadeInOut 3s ease-in-out;
+    }
+    @keyframes fadeInOut {
+      0%, 100% { opacity: 0; transform: translateY(10px); }
+      10%, 90% { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body oncontextmenu="return false">
+  <div class="content">
+    <header>Xtreme Aviator Predictor : Melbet</header>
+    <div id="liveTime">Live time : <span id="time">--:--:--</span> | Date : <span id="date">----</span></div>
+    <div class="signal-box loading" id="signalBox">
+      <div class="signal-content" id="signalContent">
+        <div class="loading-container">
+          <div class="loading-title">PREDICTING<br>NEXT SIGNAL</div>
+          <div class="loading-text">Analyzing game<br>patterns<span class="loading-dots"></span></div>
+        </div>
+      </div>
+    </div>
+    <div class="odd-display" id="oddText">Initializing prediction system...</div>
+    <div class="buttons">
+      <a href="#" class="whatsapp">Join WhatsApp</a>
+      <a href="#" class="telegram">Join Telegram</a>
+    </div>
+  </div>
+  <footer>POWERED BY XTREME PREDICTOR</footer>
+  <div class="update-notification" id="updateNotification"></div>
+
+  <script>
+    // DOM අංග
+    const signalBox = document.getElementById("signalBox");
+    const signalContent = document.getElementById("signalContent");
+    const oddEl = document.getElementById("oddText");
+    const timeEl = document.getElementById("time");
+    const dateEl = document.getElementById("date");
+    const updateNotification = document.getElementById("updateNotification");
+
+    // පද්ධති සැකසුම්
+    const CONFIG = {
+      JSON_URL: 'signals.json',
+      REFRESH_INTERVAL: 30000, // 30 තත්පර
+      LOADING_DURATION: 8000 // 8 තත්පර
+    };
+
+    // පද්ධති තත්වය
+    let state = {
+      baseSignals: [
+        { start: "01:00", end: "02:00", odd: "5× | 6× | 7×" },
+        { start: "05:00", end: "06:00", odd: "4×" },
+        { start: "08:00", end: "09:00", odd: "4× | 5× | 6× | 7×" },
+        { start: "16:00", end: "17:00", odd: "4×" },
+        { start: "18:00", end: "19:00", odd: "4× | 5× | 6× | 7×" },
+        { start: "22:00", end: "23:00", odd: "4× | 5× | 6× | 7×" },
+        { start: "25:30", end: "26:48", odd: "4×" },
+        { start: "34:00", end: "35:00", odd: "4× | 5× | 6× | 7×" },
+        { start: "36:20", end: null, odd: "4×" },
+        { start: "38:00", end: "39:00", odd: "4× | 5× | 6× | 7×" },
+        { start: "43:00", end: "44:00", odd: "4× | 5× | 6× | 7×" },
+        { start: "46:00", end: null, odd: "4×" },
+        { start: "47:00", end: "48:00", odd: "4× | 5× | 6× | 7×" },
+        { start: "50:00", end: "51:00", odd: "4× | 5× | 6× | 7×" },
+        { start: "54:00", end: "55:00", odd: "4× | 5× | 6× | 7×" },
+        { start: "56:15", end: null, odd: "4×" },
+        { start: "57:00", end: "58:00", odd: "4× | 5× | 6× | 7×" }
+      ],
+      dynamicSignals: [],
+      currentTimeline: [],
+      currentSignalIndex: -1,
+      lastUpdate: null,
+      currentHour: -1,
+      currentState: 'initial-loading',
+      lastBeepTime: 0,
+      beepAudio: null,
+      refreshTimer: null,
+      loadingStart: Date.now()
+    };
+
+    // ශබ්ද පද්ධතිය ආරම්භ කිරීම
+    function initAudio() {
+      try {
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioContext.createOscillator();
+        oscillator.type = 'sine';
+        oscillator.frequency.value = 800;
+        
+        const gainNode = audioContext.createGain();
+        gainNode.gain.value = 0;
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        state.beepAudio = { oscillator, gainNode, audioContext };
+      } catch (e) {
+        state.beepAudio = { simpleBeep: true };
+      }
+    }
+
+    // ශබ්දය වාදනය කිරීම
+    function playBeep() {
+      if (!state.beepAudio) initAudio();
+      
+      const now = Date.now();
+      if (now - state.lastBeepTime < 500) return;
+      state.lastBeepTime = now;
+      
+      try {
+        if (state.beepAudio.simpleBeep) {
+          const beep = new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU...');
+          beep.play();
+          return;
+        }
+        
+        state.beepAudio.gainNode.gain.cancelScheduledValues(state.beepAudio.audioContext.currentTime);
+        state.beepAudio.gainNode.gain.setValueAtTime(0, state.beepAudio.audioContext.currentTime);
+        state.beepAudio.oscillator.start();
+        state.beepAudio.gainNode.gain.setValueAtTime(0.5, state.beepAudio.audioContext.currentTime);
+        state.beepAudio.gainNode.gain.exponentialRampToValueAtTime(0.001, state.beepAudio.audioContext.currentTime + 0.3);
+        
+        setTimeout(() => {
+          state.beepAudio.oscillator.stop();
+          initAudio();
+        }, 300);
+      } catch (e) {
+        console.error("Beep failed:", e);
+      }
+    }
+
+    // JSON දත්ත ලබා ගැනීම
+    async function fetchSignals() {
+      try {
+        const response = await fetch(`${CONFIG.JSON_URL}?t=${Date.now()}`);
+        const data = await response.json();
+        
+        if (data.lastUpdated !== state.lastUpdate) {
+          state.dynamicSignals = processJSONSignals(data.signals);
+          state.lastUpdate = data.lastUpdated;
+          showNotification("New signals loaded!");
+          return true;
+        }
+        return false;
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        return false;
+      }
+    }
+
+    // JSON සංඥා සකස් කිරීම
+    function processJSONSignals(signals) {
+      const currentDay = new Date().toLocaleString('en-US', { weekday: 'long' });
+      const now = new Date();
+      
+      return signals.filter(signal => {
+        return !signal.days || signal.days.includes(currentDay);
+      }).map(signal => {
+        const [hours, mins] = signal.time.split(':').map(Number);
+        const startTime = new Date(now);
+        startTime.setHours(hours, mins, 0, 0);
+        
+        const endTime = new Date(startTime);
+        endTime.setMinutes(endTime.getMinutes() + (signal.duration || 1));
+        
+        return {
+          startTime,
+          endTime,
+          displayTime: `${signal.time}-${endTime.getHours()}:${endTime.getMinutes().toString().padStart(2, '0')}`,
+          odd: signal.odds,
+          color: signal.color,
+          isDynamic: true
+        };
+      });
+    }
+
+    // දැනුම්දීම් පෙන්වීම
+    function showNotification(message) {
+      updateNotification.textContent = message;
+      updateNotification.style.display = 'block';
+      setTimeout(() => updateNotification.style.display = 'none', 3000);
+    }
+
+    // වේලාව සහ දිනය යාවත්කාලීන කිරීම
+    function updateClock() {
+      const now = new Date();
+      timeEl.textContent = now.toTimeString().substr(0, 8);
+      dateEl.textContent = now.toLocaleDateString('en-GB');
+    }
+
+    // සංඥා ලැයිස්තුව ජනනය කිරීම
+    function generateTimeline() {
+      const now = new Date();
+      const currentHour = now.getHours();
+      
+      if (currentHour !== state.currentHour) {
+        state.currentHour = currentHour;
+        
+        const baseTimeline = state.baseSignals.map(signal => {
+          const [startMin, startSec] = signal.start.split(":").map(Number);
+          const startTime = new Date(now);
+          startTime.setHours(currentHour, startMin, startSec, 0);
+          
+          const endStr = signal.end || signal.start;
+          const [endMin, endSec] = endStr.split(":").map(Number);
+          const endTime = new Date(startTime);
+          endTime.setHours(currentHour, endMin, endSec, 0);
+          endTime.setMinutes(endTime.getMinutes() + (signal.end ? 1 : 1));
+          
+          return {
+            startTime,
+            endTime,
+            displayTime: signal.end ? 
+              `${currentHour.toString().padStart(2, '0')}:${signal.start}-${currentHour.toString().padStart(2, '0')}:${signal.end}` :
+              `${currentHour.toString().padStart(2, '0')}:${signal.start}`,
+            odd: signal.odd,
+            isDynamic: false
+          };
+        });
+        
+        state.currentTimeline = [...baseTimeline, ...state.dynamicSignals]
+          .filter(signal => signal.startTime.getHours() === currentHour)
+          .sort((a, b) => a.startTime - b.startTime);
+          
+        state.currentSignalIndex = findCurrentSignalIndex(state.currentTimeline, now);
+      }
+      
+      return state.currentTimeline;
+    }
+
+    // වත්මන් සංඥාව සොයා ගැනීම
+    function findCurrentSignalIndex(timeline, now) {
+      for (let i = 0; i < timeline.length; i++) {
+        if (now < timeline[i].endTime) return i;
+      }
+      return 0;
+    }
+
+    // පූර්ව සූදානම් තත්වය පෙන්වීම
+    function showLoading() {
+      signalBox.className = 'signal-box loading';
+      signalContent.innerHTML = `
+        <div class="loading-container">
+          <div class="loading-title">PREDICTING<br>NEXT SIGNAL</div>
+          <div class="loading-text">Analyzing game<br>patterns<span class="loading-dots"></span></div>
+        </div>
+      `;
+    }
+
+    // වේලාව ආකෘතියට සකස් කිරීම
+    function formatTime(seconds) {
+      const mins = Math.floor(seconds / 60);
+      const secs = seconds % 60;
+      return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    // ප්‍රදර්ශනය යාවත්කාලීන කිරීම
+    function updateDisplay() {
+      const now = new Date();
+      
+      // සංඥා ලැයිස්තුව ජනනය කිරීම
+      const timeline = generateTimeline();
+      if (timeline.length === 0) {
+        signalContent.innerHTML = `
+          <div class="loading-container">
+            <div class="loading-title">NO SIGNALS<br>AVAILABLE</div>
+            <div class="loading-text">Please check back<br>later</div>
+          </div>
+        `;
+        oddEl.textContent = 'System idle';
+        return;
+      }
+      
+      const currentSignal = timeline[state.currentSignalIndex % timeline.length];
+      const nextSignalIndex = (state.currentSignalIndex + 1) % timeline.length;
+      const nextSignal = timeline[nextSignalIndex];
+      
+      const timeUntilEnd = Math.floor((currentSignal.endTime - now) / 1000);
+      const timeUntilSignal = Math.floor((currentSignal.startTime - now) / 1000);
+      
+      // තත්වය අනුව ක්‍රියා කිරීම
+      if (state.currentState === 'initial-loading') {
+        if (Date.now() - state.loadingStart < CONFIG.LOADING_DURATION) {
+          oddEl.textContent = 'Initializing prediction system...';
+        } else {
+          state.currentState = 'waiting';
+        }
+      }
+      else if (now >= currentSignal.endTime) {
+        state.currentSignalIndex = nextSignalIndex;
+        state.currentState = 'loading';
+        state.loadingStart = Date.now();
+        showLoading();
+      }
+      else if (now >= currentSignal.startTime && now < currentSignal.endTime) {
+        if (state.currentState !== 'active') {
+          state.currentState = 'active';
+          signalBox.className = 'signal-box active';
+          if (currentSignal.color) {
+            signalBox.style.borderColor = currentSignal.color;
+            signalBox.style.boxShadow = `0 0 20px ${hexToRgba(currentSignal.color, 0.6)},
+                                        0 0 40px ${hexToRgba(currentSignal.color, 0.4)},
+                                        0 0 60px ${hexToRgba(currentSignal.color, 0.2)}`;
+          }
+          playBeep();
+        }
+        
+        signalContent.innerHTML = `
+          ${currentSignal.isDynamic ? '<div class="signal-tag">NEW</div>' : ''}
+          <div class="signal-time">${currentSignal.displayTime}</div>
+          <div class="countdown-timer">Ends in: ${formatTime(timeUntilEnd)}</div>
+        `;
+        oddEl.textContent = `ODD - ${currentSignal.odd}`;
+      }
+      else {
+        if (state.currentState !== 'waiting') {
+          state.currentState = 'waiting';
+          signalBox.className = 'signal-box waiting';
+        }
+        
+        signalContent.innerHTML = `
+          <div class="signal-time">${currentSignal.displayTime}</div>
+          <div class="countdown-timer">Starts in: ${formatTime(timeUntilSignal)}</div>
+        `;
+        oddEl.textContent = `ODD - ${currentSignal.odd}`;
+      }
+    }
+
+    // HEX වර්ණය RGBA බවට පරිවර්තනය
+    function hexToRgba(hex, alpha) {
+      const r = parseInt(hex.slice(1, 3), 16);
+      const g = parseInt(hex.slice(3, 5), 16);
+      const b = parseInt(hex.slice(5, 7), 16);
+      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+
+    // පද්ධතිය ආරම්භ කිරීම
+    async function init() {
+      // ශබ්ද පද්ධතිය ආරම්භ කිරීම
+      document.addEventListener('click', initAudio, { once: true });
+      
+      // වේලාව යාවත්කාලීන කිරීම
+      updateClock();
+      setInterval(updateClock, 1000);
+      
+      // පළමු දත්ත ලබා ගැනීම
+      await fetchSignals();
+      
+      // යාවත්කාලීන ලූපය ආරම්භ කිරීම
+      state.refreshTimer = setInterval(fetchSignals, CONFIG.REFRESH_INTERVAL);
+      
+      // ප්‍රදර්ශන යාවත්කාලීනය ආරම්භ කිරීම
+      state.loadingStart = Date.now();
+      state.currentState = 'initial-loading';
+      showLoading();
+      setInterval(updateDisplay, 100);
+    }
+
+    // යෙදුම ආරම්භ කිරීම
+    init();
+  </script>
+</body>
+</html>
